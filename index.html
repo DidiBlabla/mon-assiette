@@ -366,6 +366,11 @@ function closeZoom() { document.getElementById('zoom-modal').classList.remove('o
 function goTo(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
+  // Mettre à jour la nav du bas dans TOUS les screens
+  document.querySelectorAll('.nb').forEach(function(btn) {
+    var sc = btn.getAttribute('onclick');
+    if (sc) btn.classList.toggle('active', sc.indexOf(id) >= 0);
+  });
   if (id === 's-today') renderToday();
   if (id === 's-recettes') renderRecettes();
   if (id === 's-favoris') renderFavoris();
@@ -480,6 +485,7 @@ function genMenu() {
 
 // INIT
 document.addEventListener('DOMContentLoaded', function() {
+  goTo('s-today');
   setSaison(getSaisonActuelle());
 });
 </script>
