@@ -425,7 +425,7 @@ function renderToday() {
     var seed = new Date().getDate() + cats.indexOf(cat) * 7;
     var r = recs[seed % recs.length];
     html += '<div class="section-label">'+labels[cat]+'</div>';
-    html += '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r, false)+'</div>';
+    html += '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r)+'</div>';
   });
   document.getElementById('today-list').innerHTML = html;
 }
@@ -438,7 +438,7 @@ function renderRecettes() {
     return;
   }
   document.getElementById('rec-list').innerHTML = recs.map(function(r){
-    return '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r, true)+'</div>';
+    return '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r)+'</div>';
   }).join('');
 }
 
@@ -451,7 +451,7 @@ function renderFavoris() {
     return;
   }
   document.getElementById('fav-list').innerHTML = recs.map(function(r){
-    return '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r, true)+'</div>';
+    return '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r)+'</div>';
   }).join('');
 }
 
@@ -503,10 +503,9 @@ document.addEventListener('click', function(e) {
   openRecette(id);
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-  goTo('s-today');
-  setSaison(getSaisonActuelle());
-});
+// Script en fin de body, DOM déjà disponible
+goTo('s-today');
+setSaison(getSaisonActuelle());
 </script>
 </div><!-- #app -->
 </body>
