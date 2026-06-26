@@ -479,7 +479,9 @@ function genMenu() {
 }
 
 // INIT
-setSaison(getSaisonActuelle());
+document.addEventListener('DOMContentLoaded', function() {
+  setSaison(getSaisonActuelle());
+});
 </script>
 </div><!-- #app -->
 </body>
