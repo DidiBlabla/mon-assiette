@@ -90,6 +90,13 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
 .zoom-modal.open { display: flex; }
 .zoom-modal img { max-width: 100%; max-height: 75vh; object-fit: contain; border-radius: var(--radius); }
 .zoom-close-btn { color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 16px; cursor: pointer; padding: 8px 20px; border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; background: none; }
+.cart-btn { font-size: 16px; flex-shrink: 0; background: none; border: none; cursor: pointer; padding: 4px; }
+.ing-groupe { margin-bottom: 14px; }
+.ing-groupe-titre { font-size: 12px; font-weight: 700; color: var(--green); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1.5px solid var(--green-pale); }
+.ing-groupe-item { font-size: 13px; color: var(--text); padding: 4px 0; display: flex; gap: 6px; align-items: flex-start; }
+.ing-groupe-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green-light); flex-shrink: 0; margin-top: 6px; }
+.courses-recette-tag { display: inline-flex; align-items: center; gap: 5px; background: var(--green-pale); color: var(--green); border-radius: 20px; padding: 4px 10px; font-size: 12px; font-weight: 500; margin: 3px; }
+.courses-recette-tag button { background: none; border: none; cursor: pointer; font-size: 12px; color: var(--green); padding: 0; line-height: 1; }
 </style>
 </head>
 <body>
@@ -114,6 +121,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
     <button class="nb" onclick="goTo('s-recettes')"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Recettes</button>
     <button class="nb" onclick="goTo('s-menu')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Menu</button>
     <button class="nb" onclick="goTo('s-favoris')"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoris</button>
+    <button class="nb" onclick="goTo('s-courses')"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Courses</button>
   </nav>
 </div>
 
@@ -141,6 +149,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
     <button class="nb active" onclick="goTo('s-recettes')"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Recettes</button>
     <button class="nb" onclick="goTo('s-menu')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Menu</button>
     <button class="nb" onclick="goTo('s-favoris')"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoris</button>
+    <button class="nb" onclick="goTo('s-courses')"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Courses</button>
   </nav>
 </div>
 
@@ -157,7 +166,10 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
     </div>
     <div class="content" style="padding-top:4px;">
       <input type="file" id="det-photo-inp" accept="image/*" style="display:none;">
-      <button class="photo-upload-btn" id="det-photo-btn">📷 Ajouter ma photo de ce plat</button>
+      <div style="display:flex;gap:8px;margin:10px 0;">
+      <button class="photo-upload-btn" id="det-photo-btn" style="flex:1;margin:0;">📷 Ma photo</button>
+      <button id="det-cart-btn" onclick="toggleCartDetail()" style="flex:1;padding:10px;background:var(--green-pale);color:var(--green);border:1.5px dashed var(--green);border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;">🛒 Ajouter</button>
+    </div>
       <div id="det-meta" style="display:flex;gap:5px;flex-wrap:wrap;margin:8px 0 14px;"></div>
       <div class="card"><div class="card-title">🛒 Ingrédients</div><div id="det-ing"></div></div>
       <div class="card"><div class="card-title">👩‍🍳 Préparation</div><div id="det-etapes"></div></div>
@@ -170,6 +182,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
     <button class="nb" onclick="goTo('s-recettes')"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Recettes</button>
     <button class="nb" onclick="goTo('s-menu')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Menu</button>
     <button class="nb" onclick="goTo('s-favoris')"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoris</button>
+    <button class="nb" onclick="goTo('s-courses')"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Courses</button>
   </nav>
 </div>
 
@@ -185,6 +198,7 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
     <button class="nb" onclick="goTo('s-recettes')"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Recettes</button>
     <button class="nb active" onclick="goTo('s-menu')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Menu</button>
     <button class="nb" onclick="goTo('s-favoris')"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoris</button>
+    <button class="nb" onclick="goTo('s-courses')"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Courses</button>
   </nav>
 </div>
 
@@ -197,6 +211,32 @@ html, body { height: 100%; overflow: hidden; font-family: -apple-system, BlinkMa
     <button class="nb" onclick="goTo('s-recettes')"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Recettes</button>
     <button class="nb" onclick="goTo('s-menu')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Menu</button>
     <button class="nb active" onclick="goTo('s-favoris')"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoris</button>
+    <button class="nb" onclick="goTo('s-courses')"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Courses</button>
+  </nav>
+</div>
+
+
+<div id="s-courses" class="screen">
+  <div class="status-bar"></div>
+  <div class="hdr">
+    <h2>🛒 Liste de courses</h2>
+    <p id="courses-count">0 recette sélectionnée</p>
+  </div>
+  <div class="scroll-body">
+    <div class="content">
+      <div class="section-label">Recettes sélectionnées</div>
+      <div id="courses-recettes"></div>
+      <button class="btn btn-primary" onclick="genererCourses()" style="margin:4px 0 14px;">Générer la liste de courses</button>
+      <button class="btn" onclick="viderPanier()" style="background:var(--bg-surface);color:var(--text-muted);border:0.5px solid var(--border-mid);margin-top:0;">🗑 Vider le panier</button>
+      <div id="courses-liste"></div>
+    </div>
+  </div>
+  <nav class="bnav">
+    <button class="nb" onclick="goTo('s-today')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Aujourd'hui</button>
+    <button class="nb" onclick="goTo('s-recettes')"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Recettes</button>
+    <button class="nb" onclick="goTo('s-menu')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Menu</button>
+    <button class="nb" onclick="goTo('s-favoris')"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>Favoris</button>
+    <button class="nb active" onclick="goTo('s-courses')"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Courses</button>
   </nav>
 </div>
 
@@ -266,6 +306,7 @@ function recetteCard(r) {
     + "<span class=\"meta-pill\">" + r.difficulte + "</span>"
     + "</div></div>"
     + "<button class=\"fav-btn\" data-fav=\"" + r.id + "\">" + (fav?"❤️":"🤍") + "</button>"
+    + "<button class=\"cart-btn\" data-cart=\"" + r.id + "\">" + (inCart(r.id)?"🛒✓":"🛒") + "</button>"
     + "</div></div>";
 }
 
@@ -310,6 +351,13 @@ function openRecette(id) {
     hero.insertBefore(emo, hero.firstChild);
   }
   document.getElementById('det-fav-btn').textContent = isFav(id) ? '❤️' : '🤍';
+  var cartBtn = document.getElementById('det-cart-btn');
+  if (cartBtn) {
+    var inC = inCart(id);
+    cartBtn.textContent = inC ? '🛒 Dans le panier ✓' : '🛒 Ajouter';
+    cartBtn.style.background = inC ? 'var(--green)' : 'var(--green-pale)';
+    cartBtn.style.color = inC ? 'white' : 'var(--green)';
+  }
   // Meta
   var saisons = {'printemps':'🌸 Printemps','ete':'☀️ Été','automne':'🍂 Automne','hiver':'❄️ Hiver'};
   document.getElementById('det-meta').innerHTML =
@@ -377,6 +425,7 @@ function goTo(id) {
   if (id === 's-today') renderToday();
   if (id === 's-recettes') renderRecettes();
   if (id === 's-favoris') renderFavoris();
+  if (id === 's-courses') renderCourses();
 }
 function goBack() { goTo(prevScreen); }
 
@@ -498,6 +547,13 @@ document.addEventListener('click', function(e) {
     toggleFavCard(id);
     return;
   }
+  var cartBtn = e.target.closest('.cart-btn');
+  if (cartBtn) {
+    e.stopPropagation();
+    var inCartNow = toggleCart(id);
+    updateCartBtns(id, inCartNow);
+    return;
+  }
   var zoomTarget = e.target.getAttribute('data-zoom');
   if (zoomTarget) {
     openZoom(zoomTarget);
@@ -505,6 +561,142 @@ document.addEventListener('click', function(e) {
   }
   openRecette(id);
 });
+
+
+// ═══════════════════════════════════════
+// PANIER & LISTE DE COURSES
+// ═══════════════════════════════════════
+
+function getCart() { return DB.get('cart') || []; }
+function inCart(id) { return getCart().indexOf(id) >= 0; }
+
+function toggleCart(id) {
+  var cart = getCart();
+  var idx = cart.indexOf(id);
+  if (idx >= 0) cart.splice(idx, 1); else cart.push(id);
+  DB.set('cart', cart);
+  return cart.indexOf(id) >= 0;
+}
+
+function toggleCartDetail() {
+  var id = currentDetailId;
+  var inCartNow = toggleCart(id);
+  var btn = document.getElementById('det-cart-btn');
+  if (btn) {
+    btn.textContent = inCartNow ? '🛒 Dans le panier ✓' : '🛒 Ajouter';
+    btn.style.background = inCartNow ? 'var(--green)' : 'var(--green-pale)';
+    btn.style.color = inCartNow ? 'white' : 'var(--green)';
+  }
+  updateCartBtns(id, inCartNow);
+}
+
+function updateCartBtns(id, inCartNow) {
+  document.querySelectorAll('[data-cart="' + id + '"]').forEach(function(btn) {
+    btn.textContent = inCartNow ? '🛒✓' : '🛒';
+  });
+}
+
+function renderCourses() {
+  var cart = getCart();
+  var recs = RECETTES.filter(function(r){ return cart.indexOf(r.id) >= 0; });
+  var count = document.getElementById('courses-count');
+  if (count) count.textContent = recs.length + ' recette' + (recs.length !== 1 ? 's' : '') + ' sélectionnée' + (recs.length !== 1 ? 's' : '');
+
+  // Afficher les recettes dans le panier
+  var tagsHtml = recs.length === 0
+    ? '<div class="empty-state"><span class="big-emoji">🛒</span>Ajoute des recettes avec le bouton 🛒 sur chaque carte !</div>'
+    : '<div style="padding:4px 0 8px;">' + recs.map(function(r){
+        return '<span class="courses-recette-tag">' + r.emoji + ' ' + r.titre
+          + '<button onclick="retirerDuPanier(\'' + r.id + '\')">✕</button></span>';
+      }).join('') + '</div>';
+  var tagsEl = document.getElementById('courses-recettes');
+  if (tagsEl) tagsEl.innerHTML = tagsHtml;
+
+  // Vider la liste si panier vide
+  if (recs.length === 0) {
+    var listeEl = document.getElementById('courses-liste');
+    if (listeEl) listeEl.innerHTML = '';
+  }
+}
+
+function retirerDuPanier(id) {
+  var cart = getCart();
+  var idx = cart.indexOf(id);
+  if (idx >= 0) cart.splice(idx, 1);
+  DB.set('cart', cart);
+  updateCartBtns(id, false);
+  renderCourses();
+}
+
+function viderPanier() {
+  var cart = getCart();
+  cart.forEach(function(id) { updateCartBtns(id, false); });
+  DB.set('cart', []);
+  var listeEl = document.getElementById('courses-liste');
+  if (listeEl) listeEl.innerHTML = '';
+  renderCourses();
+}
+
+function genererCourses() {
+  var cart = getCart();
+  var recs = RECETTES.filter(function(r){ return cart.indexOf(r.id) >= 0; });
+  if (recs.length === 0) return;
+
+  // Collecter tous les ingrédients
+  // Regrouper par mot-clé principal (premier nom commun significatif)
+  var groupes = {};
+
+  recs.forEach(function(r) {
+    r.ingredients.forEach(function(ing) {
+      // Extraire le mot-clé : ignorer les quantités au début
+      // Ex: "150g de quinoa cuit" -> "quinoa"
+      // Ex: "2 gousses d'ail" -> "ail"
+      // Ex: "1 boîte de tomates concassées" -> "tomates"
+      var texte = ing.toLowerCase();
+
+      // Supprimer quantités et unités du début
+      texte = texte.replace(/^[\d\s,\.\/]+/, '');
+      texte = texte.replace(/^(g|kg|ml|l|cl|cs|cc|boîte|bocal|botte|bouquet|tranche|branche|tige|feuille|gousse|cube|pincée|poignée|morceau|verre|louche|dose|sachet|portion|tasse|bol|assiette|zeste|jus|filet|peu|dl|oz|lb)\s*(de\s*|d[''])?/i, '');
+      texte = texte.replace(/^de\s+|^d['']/, '');
+      texte = texte.replace(/^\d+\s*x\s*/, '');
+
+      // Trouver le nom principal (avant les virgules, parenthèses, qualificatifs)
+      var nom = texte.split(/\s*[\(\,]|\s+(cuit|crue?|frais|fraîche?|sec|sèche?|surgelé|émincé|râpé|haché|coupé|tranché|pelé|égoutté|rincé|en\s|au\s|à\s|avec|sans|ou\s)/i)[0].trim();
+
+      // Nettoyer les pluriels simples pour regrouper
+      var cle = nom.replace(/s$/, '').replace(/aux$/, 'al').trim();
+      if (cle.length < 3) return; // ignorer les clés trop courtes
+
+      // Garder seulement les 2-3 premiers mots max
+      cle = cle.split(/\s+/).slice(0, 3).join(' ');
+
+      if (!groupes[cle]) groupes[cle] = [];
+      // Stocker la ligne originale et la recette
+      groupes[cle].push({ ing: ing, recette: r.emoji + ' ' + r.titre });
+    });
+  });
+
+  // Trier les groupes par ordre alphabétique
+  var cles = Object.keys(groupes).sort();
+
+  // Générer le HTML
+  var html = '<div class="section-label" style="margin-top:8px;">Liste de courses</div>';
+  cles.forEach(function(cle) {
+    var items = groupes[cle];
+    html += '<div class="ing-groupe">';
+    html += '<div class="ing-groupe-titre">' + cle.charAt(0).toUpperCase() + cle.slice(1) + '</div>';
+    items.forEach(function(item) {
+      html += '<div class="ing-groupe-item"><div class="ing-groupe-dot"></div>'
+        + '<div><span style="color:var(--text);">' + item.ing + '</span>'
+        + '<span style="font-size:10px;color:var(--text-muted);display:block;margin-top:1px;">' + item.recette + '</span>'
+        + '</div></div>';
+    });
+    html += '</div>';
+  });
+
+  var listeEl = document.getElementById('courses-liste');
+  if (listeEl) listeEl.innerHTML = html;
+}
 
 // Script en fin de body, DOM déjà disponible
 goTo('s-today');
