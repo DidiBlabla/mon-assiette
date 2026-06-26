@@ -459,7 +459,7 @@ function genMenu() {
   var saison = currentSaison === "auto" ? getSaisonActuelle() : currentSaison;
   var pool = RECETTES.filter(function(r){ return r.saisons.indexOf(saison) >= 0; });
   var jours = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
-  var used = {dej:[], din:[], pdej:[]};
+  var used = {"petit-dej":[], "dejeuner":[], "diner":[]};
 
   function pick(cat) {
     var p = pool.filter(function(r){ return r.cat===cat && used[cat].indexOf(r.id)<0; });
@@ -471,9 +471,9 @@ function genMenu() {
 
   var html = "";
   jours.forEach(function(jour, i) {
-    var pdej = pick("pdej");
-    var dej = i < 5 ? pick("dej") : null;
-    var din = pick("din");
+    var pdej = pick("petit-dej");
+    var dej = i < 5 ? pick("dejeuner") : null;
+    var din = pick("diner");
     html += "<div class=\"menu-day\"><div class=\"menu-hdr\">" + jour + "</div><div class=\"menu-body\">";
     if (pdej) html += "<div class=\"menu-slot\" data-id=\"" + pdej.id + "\"><span class=\"menu-slot-lbl\">Petit-déj</span><span>" + pdej.emoji + "</span><span style=\"flex:1;font-size:12px;margin-left:6px;\">" + pdej.titre + "</span></div>";
     if (dej)  html += "<div class=\"menu-slot\" data-id=\"" + dej.id  + "\"><span class=\"menu-slot-lbl\">Déjeuner</span><span>" + dej.emoji  + "</span><span style=\"flex:1;font-size:12px;margin-left:6px;\">" + dej.titre  + "</span></div>";
