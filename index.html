@@ -240,32 +240,32 @@ function toggleFav(id) {
 
 function getPhoto(id) { return DB.get('photo_'+id) || null; }
 
-function recetteCard(r, showFav) {
+function recetteCard(r) {
   var photo = getPhoto(r.id);
-  var saisons = {'printemps':'🌸','ete':'☀️','automne':'🍂','hiver':'❄️'};
-  var saisStr = r.saisons.map(function(s){ return saisons[s] || ''; }).join('');
-  var catLabel = {'petit-dej':'Petit-déj','dejeuner':'Déjeuner','diner':'Dîner','snack':'Snack'}[r.cat] || r.cat;
+  var smap = {printemps:"🌸",ete:"☀️",automne:"🍂",hiver:"❄️"};
+  var saisStr = r.saisons.map(function(s){ return smap[s]||""; }).join("");
+  var cmap = {"petit-dej":"Petit-déj","dejeuner":"Déjeuner","diner":"Dîner","snack":"Snack"};
+  var catLabel = cmap[r.cat] || r.cat;
   var fav = isFav(r.id);
   var heroHtml = photo
-    ? '<img class="recette-photo" src="'+photo+'" alt="'+r.titre+'" onclick="openZoom(''+r.id+'')">'
-    : '<div class="recette-ph" style="background:'+r.couleur+';">'+r.emoji+'</div>';
-  return '<div class="recette-card" id="card-'+r.id+'">'
+    ? "<img class=\"recette-photo\" src=\"" + photo + "\" data-zoom=\"" + r.id + "\">"
+    : "<div class=\"recette-ph\" style=\"background:" + r.couleur + ";\">"+r.emoji+"</div>";
+  return "<div class=\"recette-card\" data-id=\"" + r.id + "\">"
     + heroHtml
-    + '<div class="recette-header">'
-    + '<div class="recette-info">'
-    + '<div class="recette-titre">'+r.titre+'</div>'
-    + '<div class="recette-pays">'+r.pays+' · '+saisStr+'</div>'
-    + '<div class="recette-meta">'
-    + '<span class="meta-pill">'+catLabel+'</span>'
-    + '<span class="meta-pill">⏱ '+r.temps+' min</span>'
-    + '<span class="meta-pill prot">💪 '+r.proteines+'g prot.</span>'
-    + '<span class="meta-pill">'+r.difficulte+'</span>'
-    + '</div>'
-    + '</div>'
-    + '<button class="fav-btn" onclick="event.stopPropagation();toggleFavCard(''+r.id+'')" id="fav-'+r.id+'">'+(fav?'❤️':'🤍')+'</button>'
-    + '</div>'
-    + '</div>';
+    + "<div class=\"recette-header\">"
+    + "<div class=\"recette-info\">"
+    + "<div class=\"recette-titre\">" + r.titre + "</div>"
+    + "<div class=\"recette-pays\">" + r.pays + " · " + saisStr + "</div>"
+    + "<div class=\"recette-meta\">"
+    + "<span class=\"meta-pill\">" + catLabel + "</span>"
+    + "<span class=\"meta-pill\">⏱ " + r.temps + " min</span>"
+    + "<span class=\"meta-pill prot\">💪 " + r.proteines + "g prot.</span>"
+    + "<span class=\"meta-pill\">" + r.difficulte + "</span>"
+    + "</div></div>"
+    + "<button class=\"fav-btn\" data-fav=\"" + r.id + "\">" + (fav?"❤️":"🤍") + "</button>"
+    + "</div></div>";
 }
+
 
 function toggleFavCard(id) {
   var isFavNow = toggleFav(id);
@@ -425,7 +425,7 @@ function renderToday() {
     var seed = new Date().getDate() + cats.indexOf(cat) * 7;
     var r = recs[seed % recs.length];
     html += '<div class="section-label">'+labels[cat]+'</div>';
-    html += '<div onclick="openRecette(''+r.id+'')">'+recetteCard(r, false)+'</div>';
+    html += '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r, false)+'</div>';
   });
   document.getElementById('today-list').innerHTML = html;
 }
@@ -438,7 +438,7 @@ function renderRecettes() {
     return;
   }
   document.getElementById('rec-list').innerHTML = recs.map(function(r){
-    return '<div onclick="openRecette(''+r.id+'')">'+recetteCard(r, true)+'</div>';
+    return '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r, true)+'</div>';
   }).join('');
 }
 
@@ -447,43 +447,62 @@ function renderFavoris() {
   var recs = RECETTES.filter(function(r){ return favs.indexOf(r.id) >= 0; });
   document.getElementById('fav-count').textContent = recs.length + ' recette' + (recs.length !== 1 ? 's' : '') + ' sauvegardée' + (recs.length !== 1 ? 's' : '');
   if (recs.length === 0) {
-    document.getElementById('fav-list').innerHTML = '<div class="empty-state"><span class="big-emoji">❤️</span>Aucun favori pour l'instant.<br>Appuie sur 🤍 sur une recette pour la sauvegarder !</div>';
+    document.getElementById("fav-list").innerHTML = "<div class=\"empty-state\"><span class=\"big-emoji\">❤️</span>Aucun favori pour l'instant.<br>Appuie sur 🤍 sur une recette pour la sauvegarder !</div>";
     return;
   }
   document.getElementById('fav-list').innerHTML = recs.map(function(r){
-    return '<div onclick="openRecette(''+r.id+'')">'+recetteCard(r, true)+'</div>';
+    return '<div class="recette-wrapper" data-id="' + r.id + '">'+recetteCard(r, true)+'</div>';
   }).join('');
 }
 
 function genMenu() {
-  var saison = currentSaison === 'auto' ? getSaisonActuelle() : currentSaison;
-  var saisonRecs = RECETTES.filter(function(r){ return r.saisons.indexOf(saison) >= 0; });
-  var jours = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
-  var html = '';
-  var usedDej = [], usedDin = [], usedPdej = [];
+  var saison = currentSaison === "auto" ? getSaisonActuelle() : currentSaison;
+  var pool = RECETTES.filter(function(r){ return r.saisons.indexOf(saison) >= 0; });
+  var jours = ["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+  var used = {dej:[], din:[], pdej:[]};
 
-  function pickRec(cat, used) {
-    var pool = saisonRecs.filter(function(r){ return r.cat === cat && used.indexOf(r.id) < 0; });
-    if (pool.length === 0) pool = saisonRecs.filter(function(r){ return r.cat === cat; });
-    var r = pool[Math.floor(Math.random() * pool.length)];
-    if (r) used.push(r.id);
+  function pick(cat) {
+    var p = pool.filter(function(r){ return r.cat===cat && used[cat].indexOf(r.id)<0; });
+    if (!p.length) p = pool.filter(function(r){ return r.cat===cat; });
+    var r = p[Math.floor(Math.random()*p.length)];
+    if (r) used[cat].push(r.id);
     return r;
   }
 
+  var html = "";
   jours.forEach(function(jour, i) {
-    var pdej = pickRec('petit-dej', usedPdej);
-    var dej = i < 5 ? pickRec('dejeuner', usedDej) : null; // semaine seulement
-    var din = pickRec('diner', usedDin);
-    html += '<div class="menu-day"><div class="menu-hdr">'+jour+'</div><div class="menu-body">';
-    if (pdej) html += '<div class="menu-slot" onclick="openRecette(''+pdej.id+'')"><span class="menu-slot-lbl">Petit-déj</span><span style="font-size:14px;">'+pdej.emoji+'</span><span style="flex:1;font-size:12px;color:var(--text);margin-left:6px;">'+pdej.titre+'</span></div>';
-    if (dej) html += '<div class="menu-slot" onclick="openRecette(''+dej.id+'')"><span class="menu-slot-lbl">Déjeuner</span><span style="font-size:14px;">'+dej.emoji+'</span><span style="flex:1;font-size:12px;color:var(--text);margin-left:6px;">'+dej.titre+'</span></div>';
-    if (din) html += '<div class="menu-slot" onclick="openRecette(''+din.id+'')"><span class="menu-slot-lbl">Dîner</span><span style="font-size:14px;">'+din.emoji+'</span><span style="flex:1;font-size:12px;color:var(--text);margin-left:6px;">'+din.titre+'</span></div>';
-    html += '</div></div>';
+    var pdej = pick("pdej");
+    var dej = i < 5 ? pick("dej") : null;
+    var din = pick("din");
+    html += "<div class=\"menu-day\"><div class=\"menu-hdr\">" + jour + "</div><div class=\"menu-body\">";
+    if (pdej) html += "<div class=\"menu-slot\" data-id=\"" + pdej.id + "\"><span class=\"menu-slot-lbl\">Petit-déj</span><span>" + pdej.emoji + "</span><span style=\"flex:1;font-size:12px;margin-left:6px;\">" + pdej.titre + "</span></div>";
+    if (dej)  html += "<div class=\"menu-slot\" data-id=\"" + dej.id  + "\"><span class=\"menu-slot-lbl\">Déjeuner</span><span>" + dej.emoji  + "</span><span style=\"flex:1;font-size:12px;margin-left:6px;\">" + dej.titre  + "</span></div>";
+    if (din)  html += "<div class=\"menu-slot\" data-id=\"" + din.id  + "\"><span class=\"menu-slot-lbl\">Dîner</span><span>" + din.emoji  + "</span><span style=\"flex:1;font-size:12px;margin-left:6px;\">" + din.titre  + "</span></div>";
+    html += "</div></div>";
   });
-  document.getElementById('menu-content').innerHTML = html;
+  document.getElementById("menu-content").innerHTML = html;
 }
 
-// INIT
+
+// INIT — délégation d'événements globale
+document.addEventListener('click', function(e) {
+  var card = e.target.closest('[data-id]');
+  if (!card) return;
+  var id = card.getAttribute('data-id');
+  var favBtn = e.target.closest('.fav-btn');
+  if (favBtn) {
+    e.stopPropagation();
+    toggleFavCard(id);
+    return;
+  }
+  var zoomTarget = e.target.getAttribute('data-zoom');
+  if (zoomTarget) {
+    openZoom(zoomTarget);
+    return;
+  }
+  openRecette(id);
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   goTo('s-today');
   setSaison(getSaisonActuelle());
